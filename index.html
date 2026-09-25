@@ -2,12 +2,19 @@
 <html lang="id" data-theme="light">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#112E3B"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
   <title>Warehouse Management System</title>
+  <meta name="description" content="Comprehensive Warehouse Management System for operational attendance, shift roster scheduling, overtime requests, leave approvals, and employee HR management." />
+  <meta property="og:title" content="Warehouse Management System" />
+  <meta property="og:description" content="Comprehensive Warehouse Management System for operational attendance, shift roster scheduling, overtime requests, leave approvals, and employee HR management." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,500&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=10.0" />
+  <link rel="stylesheet" href="style.css?v=20260925_01" />
 </head>
 <body>
   <!-- Halaman Login -->
@@ -790,6 +797,30 @@
         </section>
 
       </main>
+
+      <!-- MOBILE BOTTOM NAVIGATION (NATURAL THUMB ZONE) -->
+      <nav id="mobileBottomNav" class="mobile-bottom-nav">
+        <button type="button" class="mobile-nav-btn active" data-tab="presensiTab" onclick="switchTab('presensiTab')">
+          <span class="mobile-nav-icon">⏱️</span>
+          <span class="mobile-nav-label">Presensi</span>
+        </button>
+        <button type="button" class="mobile-nav-btn" data-tab="formLemburTab" onclick="switchTab('formLemburTab')">
+          <span class="mobile-nav-icon">⚡</span>
+          <span class="mobile-nav-label">Lembur</span>
+        </button>
+        <button type="button" class="mobile-nav-btn" data-tab="formCutiTab" onclick="switchTab('formCutiTab')">
+          <span class="mobile-nav-icon">🏖️</span>
+          <span class="mobile-nav-label">Cuti</span>
+        </button>
+        <button type="button" class="mobile-nav-btn" data-tab="profileTab" onclick="switchTab('profileTab')">
+          <span class="mobile-nav-icon">👤</span>
+          <span class="mobile-nav-label">Profil</span>
+        </button>
+        <button type="button" class="mobile-nav-btn" id="mobileMenuBtn" onclick="toggleSidebar()">
+          <span class="mobile-nav-icon">☰</span>
+          <span class="mobile-nav-label">Menu</span>
+        </button>
+      </nav>
     </div>
   </div>
 
@@ -1545,6 +1576,6 @@
 
   <!-- Supabase JS Client v2 -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="script.js?v=12.0" defer></script>
+  <script src="script.js?v=20260925_01" defer></script>
 </body>
 </html>

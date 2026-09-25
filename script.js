@@ -100,6 +100,36 @@ function showToast(msg, type = 'success') {
   clearTimeout(showToast.timeout);
   showToast.timeout = setTimeout(() => toast.classList.add('hidden'), 3500);
 }
+window.showToast = showToast;
+
+function showLoading(msg = 'Memproses data...') {
+  let overlay = document.getElementById('globalLoadingOverlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'globalLoadingOverlay';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.45);backdrop-filter:blur(2px);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999999;transition:opacity 0.2s ease;';
+    overlay.innerHTML = `
+      <div style="background:var(--card-bg, #ffffff);padding:24px 32px;border-radius:12px;box-shadow:0 10px 25px rgba(0,0,0,0.2);display:flex;flex-direction:column;align-items:center;gap:14px;min-width:200px;border:1px solid var(--border-color, #e2e8f0);">
+        <div class="spinner-icon" style="width:32px;height:32px;border:3px solid var(--accent-primary, #3b82f6);border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+        <span id="globalLoadingText" style="font-size:0.95rem;font-weight:500;color:var(--text-primary, #1e293b);">${escapeHtml(msg)}</span>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+  } else {
+    const textEl = document.getElementById('globalLoadingText');
+    if (textEl) textEl.textContent = msg;
+    overlay.style.display = 'flex';
+  }
+}
+window.showLoading = showLoading;
+
+function hideLoading() {
+  const overlay = document.getElementById('globalLoadingOverlay');
+  if (overlay) {
+    overlay.style.display = 'none';
+  }
+}
+window.hideLoading = hideLoading;
 
 function setButtonLoading(btn, isLoading, loadingText = 'Memproses...') {
   if (!btn) return;
@@ -113,6 +143,42 @@ function setButtonLoading(btn, isLoading, loadingText = 'Memproses...') {
     }
   }
 }
+window.setButtonLoading = setButtonLoading;
+
+// ================= MODAL & SPS / PEMINJAMAN HELPERS =================
+window.addPeminjamanItemRow = function() {
+  const wrap = document.getElementById('spsItemsListWrap');
+  if (!wrap) return;
+  const rowId = 'item_' + Date.now();
+  const div = document.createElement('div');
+  div.className = 'grid three-columns sps-item-row';
+  div.id = rowId;
+  div.style.alignItems = 'center';
+  div.innerHTML = `
+    <input type="text" placeholder="Nama Barang / SKU" class="sps-item-name" required />
+    <input type="number" min="1" value="1" placeholder="Qty" class="sps-item-qty" required />
+    <button type="button" class="icon-btn" onclick="document.getElementById('${rowId}').remove()" style="color:#ef4444;width:fit-content;" title="Hapus Item">🗑️</button>
+  `;
+  wrap.appendChild(div);
+};
+
+window.copyPeminjamanWaText = function() {
+  const body = document.getElementById('detailSpsBody');
+  const text = body ? body.innerText : 'Format SPS Peminjaman Warehouse';
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('✅ Format pesan WhatsApp berhasil disalin!');
+  }).catch(() => {
+    showToast('Gagal menyalin teks ke clipboard', 'error');
+  });
+};
+
+window.printSpsPdf = function() {
+  window.print();
+};
+
+window.onRefillSkuChanged = function() {
+  // Optional dynamic SKU handler
+};
 
 function switchTab(tabId) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -125,6 +191,11 @@ function switchTab(tabId) {
     topbarPageTitle.textContent = tabTitles[tabId];
   }
 
+  // Update active state in mobile bottom navigation
+  document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tabId);
+  });
+
   if (tabId === 'profileTab') {
     renderUserProfileTab();
   }
@@ -135,11 +206,9 @@ function switchTab(tabId) {
     renderAdminProfileRequestsTable();
   }
 
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('sidebarOverlay');
-  if (sidebar && overlay && window.innerWidth <= 768) {
-    sidebar.classList.remove('open');
-    overlay.classList.add('hidden');
+  // Seamlessly close drawer on mobile when navigating
+  if (window.innerWidth <= 900) {
+    closeMobileSidebar();
   }
 }
 window.switchTab = switchTab;
@@ -163,6 +232,7 @@ function openMobileSidebar() {
   const overlay = document.getElementById('sidebarOverlay');
   if (sidebar) sidebar.classList.add('open');
   if (overlay) overlay.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
 }
 
 function closeMobileSidebar() {
@@ -170,6 +240,7 @@ function closeMobileSidebar() {
   const overlay = document.getElementById('sidebarOverlay');
   if (sidebar) sidebar.classList.remove('open');
   if (overlay) overlay.classList.add('hidden');
+  document.body.style.overflow = '';
 }
 
 if (toggleSidebarBtn) toggleSidebarBtn.addEventListener('click', toggleSidebar);
@@ -1520,20 +1591,20 @@ function renderAdminRosterTable() {
 
   let html = `
     <div class="roster-matrix-controls">
-      <div style="display:flex; align-items:center; gap:16px;">
+      <div class="roster-controls-left">
         <div class="roster-matrix-date">${dateRangeStr}</div>
-        <div style="display:flex; align-items:center; gap:6px; font-size:0.75rem; color:var(--text-secondary);">
+        <div class="roster-matrix-sort">
           <span>Urutkan:</span>
-          <select onchange="window.rosterSortOrder = this.value; renderAdminRosterTable();" style="padding:4px 8px; font-size:0.75rem; border-radius:var(--radius-xs); background:var(--bg-input); color:var(--text-primary); border:1px solid var(--border-color); cursor:pointer;">
-            <option value="nik" ${window.rosterSortOrder === 'nik' ? 'selected' : ''}>NIK (WH0001, WH0002...)</option>
+          <select onchange="window.rosterSortOrder = this.value; renderAdminRosterTable();" class="roster-sort-select">
+            <option value="nik" ${window.rosterSortOrder === 'nik' ? 'selected' : ''}>NIK (WH...)</option>
             <option value="nama" ${window.rosterSortOrder === 'nama' ? 'selected' : ''}>Nama (A - Z)</option>
           </select>
         </div>
       </div>
       <div class="roster-matrix-nav">
-        <button onclick="prevRosterWeek()">&#10094;</button>
-        <button onclick="currentRosterDate = new Date(); renderAdminRosterTable()">TODAY</button>
-        <button onclick="nextRosterWeek()">&#10095;</button>
+        <button type="button" onclick="prevRosterWeek()" title="Minggu Sebelumnya">&#10094; Prev</button>
+        <button type="button" onclick="currentRosterDate = new Date(); renderAdminRosterTable()">Hari Ini</button>
+        <button type="button" onclick="nextRosterWeek()" title="Minggu Berikutnya">Next &#10095;</button>
       </div>
     </div>
   `;
@@ -1544,7 +1615,7 @@ function renderAdminRosterTable() {
     return;
   }
 
-  let tableHtml = `<div style="overflow-x: auto; overflow-y: hidden;"><table class="roster-matrix-table">
+  let tableHtml = `<div class="table-wrap roster-table-wrap"><table class="roster-matrix-table">
     <thead>
       <tr>
         <th class="emp-col">EMPLOYEES</th>

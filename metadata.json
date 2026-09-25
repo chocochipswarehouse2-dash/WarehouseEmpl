@@ -1,0 +1,8 @@
+{
+  "name": "Warehouse Management System",
+  "description": "Comprehensive Warehouse Management System for operational attendance, shift roster scheduling, overtime requests, leave approvals, and employee HR management.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
