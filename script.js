@@ -248,8 +248,8 @@ if (closeSidebarMobileBtn) closeSidebarMobileBtn.addEventListener('click', close
 if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeMobileSidebar);
 
 // ================= BACKEND CONFIGURATION (SUPABASE + GAS) =================
-const SUPABASE_URL = "https://rmrbfecagwcojtoqeovk.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_zOn1y93MF0x3CIy8MJ7I8Q_fQMkJ8x9";
+const SUPABASE_URL = "https://ilhqerecxbywqrhfpbbc.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_tMgdx9b0XBAQei7WcKYvMg_QwJ-lopn";
 const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzbydk8A6yPv0FcwI4QhhBEM5pAmW_ivNEbW3Mkb6GZYXjxIeEnUxvePC5vSjCq5CSy/exec";
 
 // Pure native REST fetch to Supabase (Zero external dependency, works 100% reliably in all browsers)

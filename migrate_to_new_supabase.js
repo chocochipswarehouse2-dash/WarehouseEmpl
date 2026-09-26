@@ -1,18 +1,22 @@
 // ==============================================================================
 // WAREHOUSE MANAGEMENT SYSTEM - AUTO DATA MIGRATOR TO NEW SUPABASE
-// Usage: node migrate_to_new_supabase.js <NEW_SUPABASE_URL> <NEW_SUPABASE_KEY>
-// Example: node migrate_to_new_supabase.js https://xyz.supabase.co eyJhbGciOi...
+// Usage: node migrate_to_new_supabase.js <NEW_SUPABASE_URL> <NEW_SUPABASE_KEY> [--clean]
+// Example: node migrate_to_new_supabase.js https://xyz.supabase.co eyJhbGciOi... --clean
 // ==============================================================================
 
 const fs = require('fs');
 
 const NEW_URL = process.argv[2];
 const NEW_KEY = process.argv[3];
+const isClean = process.argv.includes('--clean') || process.argv.includes('--overwrite');
 
 if (!NEW_URL || !NEW_KEY) {
   console.log('---------------------------------------------------------------');
-  console.log('Petunjuk Penggunaan Script Migrasi Langsung:');
-  console.log('node migrate_to_new_supabase.js <NEW_SUPABASE_URL> <NEW_SUPABASE_ANON_OR_SERVICE_KEY>');
+  console.log('Petunjuk Penggunaan Script Migrasi:');
+  console.log('1. Mode Upsert (Timpa data dengan NIK/ID yang sama saja):');
+  console.log('   node migrate_to_new_supabase.js <NEW_SUPABASE_URL> <NEW_SUPABASE_KEY>');
+  console.log('2. Mode Clean Overwrite (Kosongkan tabel tujuan dulu, lalu isi replika 100%):');
+  console.log('   node migrate_to_new_supabase.js <NEW_SUPABASE_URL> <NEW_SUPABASE_KEY> --clean');
   console.log('---------------------------------------------------------------');
   process.exit(1);
 }
@@ -37,6 +41,18 @@ const tableOrder = [
   'kasbon',
   'payroll'
 ];
+
+async function truncateTable(table) {
+  const endpoint = `${NEW_URL.replace(/\/+$/, '')}/rest/v1/${table}?select=*`;
+  // Delete all rows
+  const res = await fetch(`${NEW_URL.replace(/\/+$/, '')}/rest/v1/${table}?id=gt.0`, {
+    method: 'DELETE',
+    headers: {
+      'apikey': NEW_KEY,
+      'Authorization': `Bearer ${NEW_KEY}`
+    }
+  });
+}
 
 async function insertBatch(table, rows) {
   if (!rows || rows.length === 0) {
@@ -74,6 +90,8 @@ async function insertBatch(table, rows) {
 
 (async () => {
   console.log('Memulai proses kloning data ke Supabase Baru:', NEW_URL);
+  console.log('Mode:', isClean ? 'CLEAN OVERWRITE (Timpa Total Bersih)' : 'UPSERT (Merge & Overwrite ID yang sama)');
+  
   for (const table of tableOrder) {
     await insertBatch(table, backup[table]);
   }

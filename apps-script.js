@@ -1136,8 +1136,8 @@ function notifyEmployeeLeaveStatus(id, newStatus, adminUsername) {
 
 // ================= SINKRONISASI & BACKUP DARI SUPABASE KE GOOGLE SHEET =================
 const SUPABASE_CONFIG = {
-  url: 'https://rmrbfecagwcojtoqeovk.supabase.co',
-  anonKey: 'sb_publishable_zOn1y93MF0x3CIy8MJ7I8Q_fQMkJ8x9'
+  url: 'https://ilhqerecxbywqrhfpbbc.supabase.co',
+  anonKey: 'sb_publishable_tMgdx9b0XBAQei7WcKYvMg_QwJ-lopn'
 };
 
 function onOpen() {
